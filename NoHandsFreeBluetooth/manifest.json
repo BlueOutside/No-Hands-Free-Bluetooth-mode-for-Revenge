@@ -1,0 +1,14 @@
+{
+  "name": "Bluetooth Audio Fix",
+  "description": "Prevents Discord from enabling handsfree mode while in a call",
+  "authors": [
+    {
+      "name": "thefrenchguy4",
+      "id": "808030378521788446"
+    }
+  ],
+  "main": "index.js",
+  "vendetta": {
+    "icon": "speaker"
+  },
+}
