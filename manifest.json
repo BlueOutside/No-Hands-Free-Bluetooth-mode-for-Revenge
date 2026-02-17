@@ -1,0 +1,14 @@
+{
+  "name": "Bye hands-free",
+  "description": "Gets rid of the function responsible for toggling on/off hands-free",
+  "authors": [
+    {
+      "name": "thefrenchguy4",
+      "id": "808030378521788446"
+    }
+  ],
+  "main": "index.js",
+  "vendetta": {
+    "icon": "speaker"
+  }
+}
