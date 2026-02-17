@@ -1,47 +1,36 @@
-import { ReactNative as RN } from "@vendetta/metro/common";
-import { instead } from "@vendetta/patcher";
+(function (exports, metro, patcher) {
+    "use strict";
 
-const moduleName = "NativeAudioManagerModule";
-const functionsToPatch = ["setCommunicationModeOn", "setActiveAudioDevice"];
-let patches = [];
+    const { ReactNative: RN } = metro;
+    const moduleName = "NativeAudioManagerModule";
+    const functionsToPatch = ["setCommunicationModeOn", "setActiveAudioDevice"];
+    let patches = [];
 
-export default {
-    onLoad: () => {
-        try {
-            const registry = RN.TurboModuleRegistry;
-            
-            // 1. Try to find the module in TurboModuleRegistry (Touch this Discord and i'll make sure your boiler room explodes)
-            const newModule = registry.get(moduleName);
-            // 2. Fallback or additional check for NativeModules
-            const oldModule = RN.NativeModules[moduleName];
+    // Logic to apply patches
+    try {
+        const registry = RN.TurboModuleRegistry;
+        const newModule = registry.get(moduleName);
+        const oldModule = RN.NativeModules[moduleName];
 
-            const targets = [newModule, oldModule].filter(m => m !== null && m !== undefined);
+        const targets = [newModule, oldModule].filter(m => m !== null && m !== undefined);
 
-            if (targets.length === 0) {
-                console.log(`[Bluetooth Fix] ${moduleName} not found.`);
-                return;
-            }
-
-            for (const target of targets) {
-                for (const func of functionsToPatch) {
-                    if (typeof target[func] === "function") {
-                        patches.push(instead(func, target, () => {
-                        }));
-                    }
+        for (const target of targets) {
+            for (const func of functionsToPatch) {
+                if (typeof target[func] === "function") {
+                    // Store the unpatcher function
+                    patches.push(patcher.instead(func, target, () => {}));
                 }
             }
-
-            console.log(`[Bluetooth Fix] Applied ${patches.length} patches.`);
-        } catch (e) {
-            console.error("[Bluetooth Fix] Failed to patch:", e);
         }
-    },
-
-    onUnload: () => {
-        // Why not :p
-        for (const unpatch of patches) {
-            unpatch();
-        }
-        patches = [];
+        console.log(`[Bluetooth Fix] Patched ${patches.length} functions.`);
+    } catch (e) {
+        console.error("[Bluetooth Fix] Error:", e);
     }
-};
+
+    // This handles cleaning up when you toggle the plugin off
+    exports.onUnload = () => {
+        patches.forEach(unpatch => unpatch());
+    };
+
+    return exports;
+})({}, vendetta.metro.common, vendetta.patcher);
